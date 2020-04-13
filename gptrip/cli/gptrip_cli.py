@@ -47,17 +47,17 @@ RES = {
 def main(inname,
          outname='{inname}-{res}{fps}-{cmap}{ncolors}.mp4',
          res='hd', do_norm=False, fftshift=False,
-         device=0,
-         seed=42, coherent=False, dynamic=0., spread=1.,
+         device=0, seed=42,
+         coherent=False, exact=False, dynamic=0., spread=1.,
          cmap='hsv', ncolors=6, vmin=-3, vmax=3,
          crf=11, **kwargs):
     t0 = time()
         
     print({'inname': inname, 'outname': outname,
-           'res': res, 'do_norm': do_norm, 'device': 0,
-           'seed': seed, 'coherent': coherent, 'dynamic': dynamic, 'spread': spread,
-           'cmap': cmap, 'ncolors': ncolors, 'vmin': vmin, 'vmax': vmax,
-           'crf': crf})
+           'res': res, 'do_norm': do_norm, 'crf': crf,
+           'device': 0, 'seed': seed,
+           'coherent': coherent, 'exact': exact, 'dynamic': dynamic, 'spread': spread,
+           'cmap': cmap, 'ncolors': ncolors, 'vmin': vmin, 'vmax': vmax})
     print(kwargs)
     # exit()
 
@@ -87,16 +87,21 @@ def main(inname,
     gpt = call(GPClass, kwargs, song, *RES[res])
 
     if coherent:
-        gpt._directions = (torchutils.to_tensor if use_torch else np.array)([1, 0])
-        fftshift=True
+        gpt.coherent()
+        fftshift = True
+
+    if exact:
+        gpt._seed = 0.42  # 1 - exp(-1/2) = 0.39, but screw it
 
     if dynamic > 0:
         gpt.interpolate_directions(dynamic, spread)
 
+    if do_norm:
+        song.normalize()
+
     t1 = time()
 
     gpt.render(
-        A=gpt.normalize() if do_norm else None,
         fftshift=fftshift,
         cmap=cmap, norm=norm,
         vidname=outname, crf=crf

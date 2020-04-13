@@ -15,6 +15,7 @@ class GPTripTorch(GPTrip):
     math = torch
     random = torch.rand
     clip = torch.clamp
+    to_array = staticmethod(to_tensor)
 
     @staticmethod
     def fftshift(img):
@@ -25,17 +26,7 @@ class GPTripTorch(GPTrip):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.spec = to_tensor(self.spec)
-
-        self.fimg = to_tensor(self.fimg)
-        self.ximg_filled = to_tensor(self.ximg_filled)
-        self.xspec_masked = to_tensor(self.xspec_masked)
-
         self.ipol = FixedXInterp1d(self.xspec_masked, self.ximg_filled)
-
-    @copy_signature(GPTrip.normalize)
-    def normalize(self, *args, **kwargs):
-        return to_tensor(super().normalize(*args, **kwargs))
 
     def generate_image(self, spec, seeds):
         amps = torch.sqrt(self.ipol(spec[~self.xspec.mask]) / self.fimg)
