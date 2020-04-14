@@ -1,6 +1,6 @@
 from .colors import *
 from .song import Song
 from .gptrip import GPTrip
-from .torch.gptrip import GPTripTorch
+from . import torch
 
-__all__ = ['Song', 'GPTrip', 'GPTripTorch']
+__all__ = ['Song', 'GPTrip', 'torch']
