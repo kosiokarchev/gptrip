@@ -1,10 +1,8 @@
-import os
-from operator import itemgetter
 from functools import partial
-from itertools import repeat, zip_longest
+from itertools import zip_longest, cycle
 
 import numpy as np
-from scipy.signal import spectrogram
+from scipy.signal import stft, get_window
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -18,6 +16,7 @@ from .utils import compose
 class Song(AbstractSong):
     def __init__(self, inname, start=0, end=0,
                  specrate=16, overlaprate=float('inf'),
+                 window=('kaiser', 14),
                  specsmoothing=4, timesmoothing=0.5):
         self.inname = inname
 
@@ -31,8 +30,13 @@ class Song(AbstractSong):
         signal = np.array(self.audio.get_array_of_samples()).reshape(-1, self.audio.channels) / self.audio.max_possible_amplitude
         self.signal = signal[int(start*self.fs) : int(end*self.fs)+1 if end > start else None].T
 
-        noverlap = int(self.nperseg // overlaprate)
-        self.fspec, self.t, self.specs = spectrogram(self.signal, self.fs, nperseg=self.nperseg, noverlap=noverlap)
+        self.noverlap = int(self.nperseg // overlaprate)
+        self.window = get_window(window, self.nperseg)
+        self.fspec, self.t, self.rawspecs = stft(
+            self.signal, self.fs, self.window,
+            nperseg=self.nperseg, noverlap=self.noverlap)
+
+        self.specs = np.abs(self.rawspecs)**2
 
         self.specs = np.array([
             compose([
@@ -46,6 +50,10 @@ class Song(AbstractSong):
         ])
 
         self.spec = self.specs.mean(0)
+        self.rawspec = self.rawspecs.mean(0)
+        self.currawspec = None
+
+        self.iter = self.rawiter = None
 
         self.A = [None]
 
@@ -77,5 +85,19 @@ class Song(AbstractSong):
 
         return self.A
 
-    def __iter__(self):
+    def get_iter(self):
         return zip_longest(self.spec.T, self.A)
+
+    def __next__(self):
+        self.currawspec = next(self.rawiter)
+        return next(self.iter)
+
+    def __iter__(self):
+        self.rawiter = iter(self.rawspec.T)
+        self.iter = self.get_iter()
+        return self
+
+
+class EndlessSong(Song):
+    def get_iter(self):
+        return zip(cycle(self.spec.T), cycle(self.A))
