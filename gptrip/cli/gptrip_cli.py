@@ -117,28 +117,28 @@ def main(inname,
 
 default_map={
     'normed': dict(
-        outname='{inname}-{res}{fps}-normed-{cmap}{ncolors}.mp4',
+        outname='{basename}-{res}{fps}-normed-{cmap}{ncolors}.mp4',
         do_norm=True,
         coherent=True,
         random_seeds=True),
     'coherent': dict(
-        outname='{inname}-{res}{fps}-coherent-{cmap}{ncolors}.mp4',
+        outname='{basename}-{res}{fps}-coherent-{cmap}{ncolors}.mp4',
         coherent=True,
         random_seeds=True),
     'frozen': dict(
-        outname='{inname}-{res}{fps}-frozen-{cmap}{ncolors}.mp4',
+        outname='{basename}-{res}{fps}-frozen-{cmap}{ncolors}.mp4',
         coherent=True),
     'decoherent': dict(
-        outname='{inname}-{res}{fps}-decoherent-{cmap}{ncolors}.mp4',
+        outname='{basename}-{res}{fps}-decoherent-{cmap}{ncolors}.mp4',
         fftshift=True,
         dynamic=1.,
         spread=0.1),
     'dynamic': dict(
-        outname='{inname}-{res}{fps}-dynamic-{cmap}{ncolors}.mp4',
+        outname='{basename}-{res}{fps}-dynamic-{cmap}{ncolors}.mp4',
         dynamic=1.,
         spread=1.),
     'true': dict(
-        outname='{inname}-{res}{fps}-true-{cmap}{ncolors}.mp4')
+        outname='{basename}-{res}{fps}-true-{cmap}{ncolors}.mp4')
 }
 
 
