@@ -11,6 +11,7 @@ import torch
 from ..gptrip import GPTrip
 from .utils import to_tensor, FixedXInterp1d
 
+
 class GPTripTorch(GPTrip):
     math = torch
     random = torch.rand

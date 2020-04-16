@@ -7,7 +7,9 @@ from matplotlib import pyplot as plt
 
 from ..utils import compose
 from ..torch import utils as torchutils
-from .. import *
+from .. import GPTrip
+from ..torch import GPTripTorch
+from ..song import Song
 
 import click
 from click_option_group import optgroup
