@@ -51,7 +51,7 @@ def main(inname,
          res='hd', do_norm=False, fftshift=False,
          device=0, seed=42,
          coherent=False, exact=False, dynamic=0., spread=1.,
-         cmap='hsv', ncolors=6, vmin=-3, vmax=3,
+         cmap='hsv', ncolors=6, vmin=-3., vmax=3.,
          crf=11, **kwargs):
     t0 = time()
         
@@ -66,7 +66,8 @@ def main(inname,
     outname = outname.format(res=res, cmap=cmap, ncolors=ncolors, crf=crf,
                              norm='sum' if do_norm else 'nonorm',
                              fps=kwargs['specrate'],
-                             inname=os.path.splitext(inname)[0])
+                             inname=os.path.splitext(inname)[0],
+                             basename=os.path.basename(os.path.splitext(inname)[0]))
 
     cmap = plt.get_cmap(cmap, ncolors)
 
