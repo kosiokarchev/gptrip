@@ -13,7 +13,7 @@ setup(
         ]
     },
     install_requires=[
-        'numpy', 'matplotlib', 'ffmpeg-python', 'pydub'
+        'numpy', 'scikit-image', 'matplotlib', 'ffmpeg-python', 'pydub'
     ],
     extras_require={
         'TORCH': 'torch'
