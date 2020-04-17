@@ -3,7 +3,7 @@ from functools import partial
 from time import time
 
 import torch, numpy as np
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, colors
 
 from ..utils import compose
 from ..torch import utils as torchutils
@@ -68,8 +68,10 @@ def main(inname,
                              fps=kwargs['specrate'],
                              inname=os.path.splitext(inname)[0],
                              basename=os.path.basename(os.path.splitext(inname)[0]))
-
-    cmap = plt.get_cmap(cmap, ncolors)
+    try:
+        cmap = colors.LinearSegmentedColormap.from_list('cmap', eval(cmap), N=ncolors)
+    except:
+        cmap = plt.get_cmap(cmap, ncolors)
 
     use_torch = torch.cuda.is_available() and 0 <= device < torch.cuda.device_count()
 
@@ -138,7 +140,10 @@ default_map={
         dynamic=1.,
         spread=1.),
     'true': dict(
-        outname='{basename}-{res}{fps}-true-{cmap}{ncolors}.mp4')
+        outname='{basename}-{res}{fps}-true-{cmap}{ncolors}.mp4'),
+    'exact': dict(
+        outname='{basename}-{res}{fps}-exact-{cmap}{ncolors}.mp4',
+        exact=True, coherent=True)
 }
 
 
