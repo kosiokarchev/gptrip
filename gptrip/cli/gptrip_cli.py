@@ -96,7 +96,8 @@ def main(inname,
         fftshift = True
 
     if exact:
-        gpt._seed = 0.42  # 1 - exp(-1/2) = 0.39, but screw it
+        # 1 - exp(-1/2) = 0.39, but screw it
+        gpt._seed = torchutils.to_tensor(0.42) if use_torch else 0.42
 
     if dynamic > 0:
         gpt.interpolate_directions(dynamic, spread)
