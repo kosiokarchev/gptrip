@@ -2,7 +2,7 @@ from math import pi
 from time import time
 
 import numpy as np
-import pandas as pd
+from skimage.transform import resize
 from matplotlib import pyplot as plt
 
 import ffmpeg
@@ -17,14 +17,17 @@ class GPTrip(AbstractGPTrip):
     def fftshift(img):
         return np.fftshift(img)
 
-    def __init__(self, song: Song, width, height,
+    def __init__(self, song: Song, width, height, fftscale=1,
                  minfreq=60., maxfreq=1e4,
                  minwav=0., maxwav=1.,
                  random_directions=False, random_seeds=False):
         self.song = song
         self.nframes = len(self.song.spec.T)
 
-        super().__init__(width, height, self.song.fspec,
+        self.outwidth, self.outheight = width, height
+        self.fftscale = fftscale
+
+        super().__init__(width // fftscale, height // fftscale, self.song.fspec,
                          minfreq, maxfreq, minwav, maxwav,
                          random_directions, random_seeds)
 
@@ -36,6 +39,9 @@ class GPTrip(AbstractGPTrip):
             self.phases_to_directions,
             RegularXInterpolator(0, self.nframes,
                                  spread * 2*pi * (self.random((self.song.to_frac(dt),) + self.fimg.shape)) - 0.5))
+
+    def upscale(self, img):
+        return resize(img, (self.height, self.width))
 
     def render(self, do_plot=False, fftshift=False,
                cmap=plt.get_cmap(), norm=plt.Normalize(-1, 1),
@@ -49,7 +55,7 @@ class GPTrip(AbstractGPTrip):
         if vidname:
             cmd = ffmpeg.output(
                 ffmpeg.input('pipe:', format='rawvideo', pix_fmt='rgb24',
-                             s=f'{self.width}x{self.height}', r=self.song.specrate),
+                             s=f'{self.outwidth}x{self.outheight}', r=self.song.specrate),
                 ffmpeg.input(self.song.inname, ss=self.song.start, to=self.song.end).audio,
                 vidname, **{'c:v': 'libx264'}, pix_fmt='yuv420p', crf=crf
             )
@@ -66,7 +72,7 @@ class GPTrip(AbstractGPTrip):
                     img = self.fftshift(img)
 
                 sigma = self.math.sqrt((img ** 2).mean())
-                img_final = cmap(norm(img / sigma))[..., :3]
+                img_final = cmap(self.upscale(norm(img / sigma)))[..., :3]
                 img_final = self.clip(img_final if a is None else a * img_final, 0., 1.)
 
                 if do_plot:

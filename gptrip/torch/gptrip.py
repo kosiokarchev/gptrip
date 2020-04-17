@@ -36,3 +36,6 @@ class GPTripTorch(GPTrip):
         img = torch.irfft(seeds * amps.unsqueeze(-1), 2,
                           signal_sizes=(self.height, self.width))
         return img, amps
+
+    def upscale(self, img):
+        return torch.nn.functional.interpolate(img[None, None, ...], size=(self.outheight, self.outwidth), mode='bilinear', align_corners=True)[0, 0]
