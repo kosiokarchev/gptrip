@@ -48,6 +48,7 @@ RES = {
 
 def main(inname,
          outname='{inname}-{res}{fps}-{cmap}{ncolors}.mp4',
+         outdir=os.path.curdir,
          res='hd', do_norm=False, fftshift=False,
          device=0, seed=42,
          coherent=False, exact=None, dynamic=0., spread=1.,
@@ -55,18 +56,22 @@ def main(inname,
          crf=11, **kwargs):
     t0 = time()
         
-    print({'inname': inname, 'outname': outname,
+    print({'inname': inname, 'outdir': outdir, 'outname': outname,
            'res': res, 'do_norm': do_norm, 'crf': crf,
            'device': 0, 'seed': seed,
            'coherent': coherent, 'exact': exact, 'dynamic': dynamic, 'spread': spread,
            'cmap': cmap, 'ncolors': ncolors, 'vmin': vmin, 'vmax': vmax})
     print(kwargs)
 
-    outname = outname.format(res=res, cmap=cmap, ncolors=ncolors, crf=crf,
-                             norm='sum' if do_norm else 'nonorm',
-                             fps=kwargs['specrate'],
-                             inname=os.path.splitext(inname)[0],
-                             basename=os.path.basename(os.path.splitext(inname)[0]))
+    outname = os.path.join(
+        outdir,
+        outname.format(res=res, cmap=cmap, ncolors=ncolors, crf=crf,
+                       norm='sum' if do_norm else 'nonorm',
+                       fps=kwargs['specrate'],
+                       inname=os.path.splitext(inname)[0],
+                       basename=os.path.basename(os.path.splitext(inname)[0]))
+    )
+
     try:
         cmap = colors.LinearSegmentedColormap.from_list('cmap', eval(cmap), N=ncolors)
     except:
