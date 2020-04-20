@@ -50,7 +50,7 @@ def main(inname,
          outname='{inname}-{res}{fps}-{cmap}{ncolors}.mp4',
          res='hd', do_norm=False, fftshift=False,
          device=0, seed=42,
-         coherent=False, exact=False, dynamic=0., spread=1.,
+         coherent=False, exact=None, dynamic=0., spread=1.,
          cmap='hsv', ncolors=6, vmin=-3., vmax=3.,
          crf=11, **kwargs):
     t0 = time()
@@ -61,7 +61,6 @@ def main(inname,
            'coherent': coherent, 'exact': exact, 'dynamic': dynamic, 'spread': spread,
            'cmap': cmap, 'ncolors': ncolors, 'vmin': vmin, 'vmax': vmax})
     print(kwargs)
-    # exit()
 
     outname = outname.format(res=res, cmap=cmap, ncolors=ncolors, crf=crf,
                              norm='sum' if do_norm else 'nonorm',
@@ -95,9 +94,8 @@ def main(inname,
         gpt.coherent()
         fftshift = True
 
-    if exact:
-        # 1 - exp(-1/2) = 0.39, but screw it
-        gpt._seed = torchutils.to_tensor(0.42) if use_torch else 0.42
+    if exact is not None:
+        gpt.exact(exact)
 
     if dynamic > 0:
         gpt.interpolate_directions(dynamic, spread)
@@ -157,11 +155,11 @@ def set_defaults(ctx, param, value):
 
 copts, cargs = signature_to_decs(signature(main))
 cargs['inname'] = click.argument('inname', type=click.Path(exists=True, dir_okay=False, readable=True))
-# cargs['outname'] = click.argument('outname', type=click.Path(dir_okay=False, writable=True))
 copts['res'] = click.option('--res', type=click.Choice(RES.keys()), default='hd', show_default=True)
-copts['cmd_normed'] = click.option(
+copts['exact'] = click.option('--exact', type=float, default=None, show_default=True)
+copts['preset'] = click.option(
     '--preset', is_eager=True, expose_value=False,
-    callback=partial(set_defaults, )
+    callback=partial(set_defaults,)
 )
 
 cli = compose(click.command(),
