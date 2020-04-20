@@ -16,7 +16,8 @@ setup(
         'numpy', 'scikit-image', 'matplotlib', 'ffmpeg-python', 'pydub'
     ],
     extras_require={
-        'TORCH': 'torch'
+        'TORCH': 'torch',
+        'LIVE': ['kivy', 'sounddevice']
     },
     python_requires='>=3.6',
     package_data={
