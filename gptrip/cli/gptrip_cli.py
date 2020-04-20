@@ -142,7 +142,7 @@ default_map={
         outname='{basename}-{res}{fps}-true-{cmap}{ncolors}.mp4'),
     'exact': dict(
         outname='{basename}-{res}{fps}-exact-{cmap}{ncolors}.mp4',
-        exact=True, coherent=True)
+        exact=0., coherent=True)
 }
 
 
