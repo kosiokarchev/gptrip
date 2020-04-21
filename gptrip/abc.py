@@ -62,7 +62,7 @@ class AbstractGPTrip:
         self._directions = self.to_array([1., 0.])
 
     def exact(self, scatter=0.):
-        self._seed = self.to_array(np.clip(0.42 + np.random.normal(0., scatter, self.fimg.shape), 0., 1.))
+        self._seed = self.to_array(np.clip(0.42 + np.random.normal(0., scatter, self.fimg.shape), 1e-3, 1.-1e-3))
 
     def seed(self, i):
         if self.random_seeds or self._seed is None:

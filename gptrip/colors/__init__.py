@@ -13,10 +13,6 @@ def register(name, clrs):
 
 for fname in glob(os.path.join(os.path.dirname(__file__), '*.cmap')):
     register(os.path.basename(fname)[:-5], np.loadtxt(fname, dtype=int)/255.)
-    # cm.register_cmap(cmap=colors.ListedColormap(
-    #     colors=np.loadtxt(fname, dtype=int)/255.,
-    #     name=os.path.basename(fname)[:-5]
-    # ))
 
 for i in permutations(range(3)):
     register(''.join(np.array(('r', 'g', 'b'))[i,]), np.eye(3)[i,])
